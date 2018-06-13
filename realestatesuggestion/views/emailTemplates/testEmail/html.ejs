@@ -1,0 +1,9 @@
+<script>
+  var time = new Date(Date.prototype.getTime);
+</script>
+<p>Dear <%=recipientName%>,</p>
+<!--<p><em>Thank you</em> for being a friend.</p>-->
+<p>It's only human to forget. If you want to change your password please click on the link below.</p>
+<br>
+<a href="http://localhost:1337/changePassword?idem=<%=id%>&tessera=<%=password%>&tempus=<%= time%>">http://localhost:1337/changePassword?idem=<%=id%>&tessera=<%=password%></a>
+<p>Love,<br/><%=senderName%></p>

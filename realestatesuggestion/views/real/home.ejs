@@ -1,0 +1,384 @@
+<link href="/assets/css/examples.css" rel="stylesheet"/>
+<script>
+  function openCity(evt, tabName) {
+// Declare all variables
+    var i, tabcontent, tablinks;
+
+// Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+
+// Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+// Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+
+    $("#jsGrid_UserQuestions").jsGrid("refresh");
+    $("#jsGrid_SearchHistory").jsGrid("refresh");
+  }
+</script>
+<script type="text/javascript" src="assets/js/HomeCollectInformation.js"></script>
+
+
+<% if (typeof(user) === 'undefined' || typeof(user) === 'boolean')  { %>
+<div class="home-background">
+  <div class="filter-black"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1 ">
+        <div id="suggestPrice" class="register-card">
+          <h3 class="title">Welcome</h3>
+          <div class="alert alert-danger" id="error"></div>
+          <div class="alert alert-success" id="success"></div>
+          <form role="form" id="suggest-form"  action="/suggest" method="post">
+            <label>Search Here</label>
+            <input type="text" class="form-control" placeholder="Location" name="location">
+            <input type="text" class="form-control" placeholder="Size" name="size">
+            <input type="submit" value="Search" class="btn btn-fill btn-danger btn-block">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% }
+else { %>
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_1')">Search</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_2')">Support Questions</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_3')">Search history</a></li>
+</ul>
+
+<div id="tab_1" class="tabcontent">
+  <!--<h3>Search</h3>-->
+  <!--<p>This tab will contain something about the Search</p>-->
+  <div class="home-background">
+    <div class="filter-black"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1 ">
+          <div id="suggestPrice" class="register-card">
+            <h3 class="title">Welcome</h3>
+            <div class="alert alert-danger" id="error"></div>
+            <div class="alert alert-success" id="success"></div>
+            <form role="form" id="suggest-form"  action="/suggest" method="post">
+              <label>Search Here</label>
+              <input type="text" class="form-control" placeholder="Location" name="location">
+              <input type="text" class="form-control" placeholder="Size" name="size">
+              <input type="submit" value="Search" class="btn btn-fill btn-danger btn-block">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tab_2" class="tabcontent">
+  <h3>Support Question</h3>
+  <p>Your previous questions:</p>
+  <div id="jsGrid_UserQuestions"></div>
+  <div id="jqDialog_UserQuestionDetails" class="jqDialog">
+    <fieldset>
+      <legend>Your question:</legend>
+      <table>
+        <tr>
+          <div class="details-form-field">
+            <td>
+              <label>Title&#160;</label>
+            </td>
+            <td>&#160;&#160;&#160;&#160;&#160;&#160;</td>
+            <td>
+              <span readonly id="title" ></span>
+            </td>
+          </div>
+        </tr>
+        <tr>
+          <td>&#160;</td>
+          <td>&#160;</td>
+          <td>&#160;</td>
+        </tr>
+        <tr>
+          <div class="details-form-field">
+            <td>
+              <label>Body</label>
+            </td>
+            <td>&#160;&#160;&#160;&#160;&#160;&#160;</td>
+            <td>
+              <span readonly id="questionBody"></span>
+            </td>
+          </div>
+        </tr>
+        <tr>
+          <td>&#160;</td>
+          <td>&#160;</td>
+          <td>&#160;</td>
+        </tr>
+        <tr>
+          <div class="details-form-field">
+            <td>
+              <label>Question Date</label>
+            </td>
+            <td>&#160;&#160;&#160;&#160;&#160;&#160;</td>
+            <td>
+              <span readonly id="qdate" ></span>
+            </td>
+          </div>
+        </tr>
+        <tr>
+          <td>&#160;</td>
+          <td>&#160;</td>
+          <td>&#160;</td>
+        </tr>
+        <tr>
+          <div class="details-form-field">
+            <td>
+              <label>Response</label>
+            </td>
+            <td>&#160;&#160;&#160;&#160;&#160;&#160;</td>
+            <td>
+              <span readonly id="response"></span>
+            </td>
+          </div>
+        </tr>
+        <tr>
+          <td>&#160;</td>
+          <td>&#160;</td>
+          <td>&#160;</td>
+        </tr>
+        <tr>
+          <div class="details-form-field">
+            <td>
+              <label>Response Date</label>
+            </td>
+            <td>&#160;&#160;&#160;&#160;&#160;&#160;</td>
+            <td>
+              <span readonly id="rdate" ></span>
+            </td>
+          </div>
+        </tr>
+      </table>
+      <br>
+    </fieldset>
+
+  </div>
+  <!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+  <script>
+    var dlgDetails = $("#jqDialog_UserQuestionDetails").dialog({
+      autoOpen: false,
+      width: 400,
+      height: "auto",
+      modal: true
+//      buttons: {
+//        Cancel: function () {
+//          $(this).dialog("close");
+//        }
+//      }
+    });
+
+    $("#jsGrid_UserQuestions").jsGrid({
+      height: "500px",
+      width: "100%",
+      filtering: true,
+      editing: false,
+      deleting: false,
+      inserting: false,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 15,
+      pageButtonCount: 5,
+      controller: {
+        loadData: function (filter) {
+          var data = $.Deferred();
+          $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "/supportquestion",
+            dataType: "json"
+          }).done(function (response) {
+            response = $.grep(response, function (item) {
+              return (!filter.firstName || item.firstName.indexOf(filter.firstName) > -1)
+                && (!filter.lastName || item.lastName.indexOf(filter.lastName) > -1)
+                && (!filter.username || item.username.indexOf(filter.username) > -1)
+                && (!filter.email || item.email.indexOf(filter.email) > -1)
+                && (!filter.userType || item.userType.indexOf(filter.userType) > -1);
+            });
+
+            data.resolve(response);
+            //console.log(response);
+          });
+          return data.promise();
+        },
+      },
+
+      fields: [
+        {name: "id", type: "text", width: 0, title: "id", visible: false},
+        {
+          name: "questionTitle", type: "text", width: 100, title: "Title", itemTemplate: function (value) {
+          var valueToShow = "";
+          if (value.length > 13) {
+            valueToShow = value.substring(0, 10) + "...";
+            return $("<div>").append(valueToShow);
+          }
+          else {
+            return $("<div>").append(value);
+          }
+        }
+        },
+        {
+          name: "questionBody", type: "text", width: 150, title: "Body", itemTemplate: function (value) {
+          var valueToShow = "";
+          if (value.length > 25) {
+            valueToShow = value.substring(0, 20) + "...";
+            return $("<div>").append(valueToShow);
+          }
+          else {
+            return $("<div>").append(value);
+          }
+        }
+        },
+        {
+          name: "createdAt", type: "text", width: 150, title: "Question date", itemTemplate: function (value) {
+          var d = new Date(value);
+          return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+        }
+        },
+        {
+          name: "responseDetail", type: "text", width: 150, title: "Response", itemTemplate: function (value) {
+          var valueToShow = "";
+          if (value.length > 25) {
+            valueToShow = value.substring(0, 20) + "...";
+            return $("<div>").append(valueToShow);
+          }
+          else {
+            return $("<div>").append(value);
+          }
+        }
+        },
+        {
+          name: "responseDate", type: "text", width: 150, title: "Response Date", itemTemplate: function (value) {
+          var d = new Date(value);
+          return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+        }
+        },
+        {
+          type: "control", width: 100, deleteButton: false, editButton: false,
+          itemTemplate: function (value, item) {
+            var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+            var $customButton = $("<button>")
+              .text("more")
+              .click(function (e) {
+                //alert("we will go to a new page to show the question of this id: " + item.id);
+                $('#title').html(item.questionTitle);
+                $('#questionBody').html(item.questionBody);
+                $('#qdate').html(item.createdAt);
+                $('#response').html(item.responseDetail);
+                $('#rdate').html(item.responseDate);
+                dlgDetails.dialog("open");
+
+                e.stopPropagation();
+              });
+
+            return $result.add($customButton);
+          }
+        }
+      ]
+    });
+  </script>
+
+</div>
+
+<div id="tab_3" class="tabcontent">
+  <h3>Search History</h3>
+  <p>This tab will contain something about Search History</p>
+
+  <div id="jsGrid_SearchHistory"></div>
+
+  <script>
+    $("#jsGrid_SearchHistory").jsGrid({
+      height: "500px",
+      width: "100%",
+      filtering: true,
+      editing: false,
+      //inserting: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 15,
+      pageButtonCount: 5,
+      controller: {
+        loadData: function (filter) {
+          var data = $.Deferred();
+          $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "/searchhistory",
+            dataType: "json"
+          }).done(function (response) {
+            response = $.grep(response, function (item) {
+
+
+              return (!filter.suggestedPrice || item.suggestedPrice === filter.suggestedPrice)
+                && (!filter.searchDate || item.searchDate.indexOf(filter.searchDate) > -1)
+                && (!filter.landType || item.landType.indexOf(filter.landType) > -1)
+                && (!filter.locatedArea || item.locatedArea.indexOf(filter.locatedArea) > -1)
+                && (!filter.user.lastName || item.user.lastName.indexOf(filter.user.lastName) > -1);
+            });
+
+            data.resolve(response);
+            console.log(response);
+          });
+          return data.promise();
+        }
+      },
+
+      fields: [
+
+        {name: "suggestedPrice", type: "number", width: 150, validate: "required"},
+        {name: "searchDate", type: "text", width: 150, validate: "required", title: "search date", itemTemplate: function (value) {
+          var d = new Date(value);
+          return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+        }},
+        {name: "landType", type: "text", width: 150, validate: "required", title: "Land Type"},
+        {name: "locatedArea", type: "text", width: 150, validate: "required", title: "Area"},
+        {name: "user.lastName", type: "text", width: 150, validate: "required", title: "Name"},
+        {type: "control", editButton:false, deleteButton:false}
+      ]
+    });
+  </script>
+
+</div>
+
+<% } %>
+
+
+<!--<footer id="main-footer" class="footer-demo section-dark">-->
+<!--<div class="container">-->
+<!--<nav class="pull-left">-->
+<!--<ul>-->
+
+<!--<li>-->
+<!--<a href="#">-->
+<!--PM102-->
+<!--</a>-->
+<!--</li>-->
+<!--<li>-->
+<!--<a href="http://blog.creative-tim.com">-->
+<!--An Advanced Application Programming Project-->
+<!--</a>-->
+<!--</li>-->
+<!--</ul>-->
+<!--</nav>-->
+<!--<div class="copyright pull-right">-->
+<!--&copy; 2016, made for PM102-->
+<!--</div>-->
+<!--</div>-->
+<!--</footer>-->

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%=typeof title == 'undefined' ? 'Real Estate Bargain' : title%></title>
+
+  <!-- Viewport mobile tag for sensible mobile support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+  <!--
+      Stylesheets and Preprocessors
+      ==============================
+
+      You can always bring in CSS files manually with `<link>` tags, or asynchronously
+      using a solution like AMD (RequireJS).  Or, if you like, you can take advantage
+      of Sails' conventional asset pipeline (boilerplate Gruntfile).
+
+      By default, stylesheets from your `assets/styles` folder are included
+      here automatically (between STYLES and STYLES END). Both CSS (.css) and LESS (.less)
+      are supported. In production, your styles will be minified and concatenated into
+      a single file.
+
+      To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
+      For example, here are a few things you could do:
+
+          + Change the order of your CSS files
+          + Import stylesheets from other directories
+          + Use a different or additional preprocessor, like SASS, SCSS or Stylus
+  -->
+
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqPEz-Si0ebN0u3vMVflkLm4vn8BmYcUw&callback=initMap" async defer></script>
+
+  <!--ALL JS GRID STUFF-->
+  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid-theme.min.css" />
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.2/jsgrid.min.js"></script>
+
+
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+  <meta name="viewport" content="width=device-width" />
+  <link href="bootstrap3/css/bootstrap.css" rel="stylesheet" />
+  <link href="assets/css/ct-paper.css" rel="stylesheet"/>
+  <link href="assets/css/demo.css" rel="stylesheet" />
+
+  <!--     Fonts and icons     -->
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+  <!--STYLES-->
+  <link rel="stylesheet" href="/styles/chat.css">
+  <link rel="stylesheet" href="/styles/importer.css">
+  <link rel="stylesheet" href="/styles/main.css">
+  <!--STYLES END-->
+
+  <style type="text/css">
+    .ui-widget *, .ui-widget input, .ui-widget select, .ui-widget button {
+      font-family: 'Helvetica Neue Light', 'Open Sans', Helvetica;
+      font-size: 14px;
+      font-weight: 300 !important;
+    }
+
+    .details-form-field input,
+    .details-form-field select {
+      width: 250px;
+      float: right;
+    }
+
+    .details-form-field {
+      margin: 30px 0;
+    }
+
+    .details-form-field:first-child {
+      margin-top: 10px;
+    }
+
+    .details-form-field:last-child {
+      margin-bottom: 10px;
+    }
+
+    .details-form-field button {
+      display: block;
+      width: 100px;
+      margin: 0 auto;
+    }
+
+    input.error, select.error {
+      border: 1px solid #ff9999;
+      background: #ffeeee;
+    }
+
+    label.error {
+      float: right;
+      margin-left: 100px;
+      font-size: .8em;
+      color: #ff6666;
+    }
+  </style>
+</head>
+
+<body>
+<nav class="navbar navbar-default" role="navigation-demo" id="demo-navbar">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Real Estate Bargain</a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="navigation-example-2">
+      <% if (typeof(user) === 'undefined' || typeof(user) === 'boolean') { %>
+      <div id="loginForm">
+        <form role="form" id="loginForm-form" action="/login" method="post">
+          <table class="nav navbar-nav navbar-right">
+            <tr>
+
+              <td><input type="text" class="form-control" placeholder="Username" name="username"></td>
+              <td>&#160;&#160;&#160;</td>
+              <td><input type="password" class="form-control" placeholder="Password" name="password"></td>
+              <td>
+                <button name="signIn_btn" class="btn btn-fill btn-success">Sign In</button>
+              </td>
+
+              <!--<td>&#160;&#160;&#160;</td>-->
+              <td><a href="/register" class="btn btn-fill btn-warning">Sign Up</a></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+      <% } else { %>
+      <table class="nav navbar-nav navbar-right">
+        <tr>
+          <td><strong class="navbar-brand">Welcome,</strong> <strong class="navbar-brand"><%= user.lastName %></strong></td>
+          <td> <strong class="navbar-brand">|</strong> </td>
+          <td><div class="dropdown">
+              <strong class="dropbtn">Settings</strong>
+              <div class="dropdown-content">
+                <a href="/changeData">Change Data</a>
+                <a href="/logout">Logout</a>
+              </div>
+            </div></td>
+        </tr>
+      </table>
+      <% } %>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-->
+</nav>
+
+<div class="wrapper">
+
+  <%- body %>
+
+  <script>
+    $(document).on('click', '.panel-heading-chat span.icon_minim', function (e) {
+      var $this = $(this);
+      if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel-chat').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.removeClass('glyphicon-minus').addClass('glyphicon-plus');
+      } else {
+        $this.parents('.panel-chat').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.removeClass('glyphicon-plus').addClass('glyphicon-minus');
+      }
+    });
+    $(document).on('focus', '.panel-footer input.chat_input', function (e) {
+      var $this = $(this);
+      if ($('#minim_chat_window').hasClass('panel-collapsed')) {
+        $this.parents('.panel-chat').find('.panel-body').slideDown();
+        $('#minim_chat_window').removeClass('panel-collapsed');
+        $('#minim_chat_window').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+      }
+    });
+    $(document).on('click', '#new_chat', function (e) {
+      var size = $( ".chat-window:last-child" ).css("margin-left");
+      size_total = parseInt(size) + 400;
+      alert(size_total);
+      var clone = $( "#chat_window_1" ).clone().appendTo( ".container" );
+      clone.css("margin-left", size_total);
+    });
+    $(document).on('click', '.icon_close', function (e) {
+      //$(this).parent().parent().parent().parent().remove();
+      $( "#chat_window_1" ).remove();
+    });
+
+  </script>
+
+  <% if (typeof(user) === 'undefined' || typeof(user) === 'boolean') { %>
+  <div></div>
+  <% } else { %>
+  <div class="container">
+    <div class="row chat-window col-xs-5 col-md-3" id="chat_window_1" style="margin-left:10px; z-index: 90;">
+      <div class="col-xs-12 col-md-12">
+        <div class="panel-chat panel-default-chat">
+          <div class="panel-heading-chat top-bar">
+            <div class="col-md-8 col-xs-8">
+              <h3 class="panel-title-chat"><span class="glyphicon glyphicon-comment"></span> Chat - Support</h3>
+            </div>
+            <div class="col-md-4 col-xs-4" style="text-align: right;">
+              <a href="#"><span id="minim_chat_window" class="glyphicon glyphicon-minus icon_minim"></span></a>
+            </div>
+          </div>
+          <div id="chat" class="panel-body msg_container_base">
+            <br>
+            <p>Welcome to Real Estate Chat!</p>
+            <div id="chat_begin">
+
+            </div>
+            <div id="messages" class="row msg_container base_sent">
+
+            </div>
+          </div>
+          <div class="panel-footer">
+            <div class="input-group">
+              <input id="new-message" type="text" class="form-control-chat input-sm-chat chat_input" placeholder="Write your message here..." />
+              <span class="input-group-btn">
+                        <button class="btn btn-primary btn-sm" id="send-message">Send</button>
+                        </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+
+
+
+<!--
+    Client-side Templates
+    ========================
+
+    HTML templates are important prerequisites of modern, rich client applications.
+    To work their magic, frameworks like Backbone, Angular, Ember, and Knockout require
+    that you load these templates client-side.
+
+    By default, your Gruntfile is configured to automatically load and precompile
+    client-side JST templates in your `assets/templates` folder, then
+    include them here automatically (between TEMPLATES and TEMPLATES END).
+
+    To customize this behavior to fit your needs, just edit `tasks/pipeline.js`.
+    For example, here are a few things you could do:
+
+        + Import templates from other directories
+        + Use a different template engine (handlebars, jade, dust, etc.)
+        + Internationalize your client-side templates using a server-side
+          stringfile before they're served.
+-->
+
+<!--TEMPLATES-->
+
+<!--TEMPLATES END-->
+
+
+<!--
+
+  Client-side Javascript
+  ========================
+
+  You can always bring in JS files manually with `script` tags, or asynchronously
+  on the client using a solution like AMD (RequireJS).  Or, if you like, you can
+  take advantage of Sails' conventional asset pipeline (boilerplate Gruntfile).
+
+  By default, files in your `assets/js` folder are included here
+  automatically (between SCRIPTS and SCRIPTS END).  Both JavaScript (.js) and
+  CoffeeScript (.coffee) are supported. In production, your scripts will be minified
+  and concatenated into a single file.
+
+  To customize any part of the built-in behavior, just edit `tasks/pipeline.js`.
+  For example, here are a few things you could do:
+
+      + Change the order of your scripts
+      + Import scripts from other directories
+      + Use a different preprocessor, like TypeScript
+
+-->
+
+
+
+
+
+<!--SCRIPTS-->
+<script src="/js/dependencies/sails.io.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/HomeCollectInformation.js"></script>
+<script src="/js/moment.min.js"></script>
+<!--SCRIPTS END-->
+</body>
+</html>

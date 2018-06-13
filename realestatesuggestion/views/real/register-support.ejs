@@ -1,0 +1,33 @@
+<link href="/assets/css/examples.css" rel="stylesheet"/>
+<div class="register-background">
+  <div class="filter-black"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1 ">
+        <div id="createUser" class="register-card">
+          <h3 class="title">Welcome</h3>
+          <div class="alert alert-danger" id="error"></div>
+          <div class="alert alert-success" id="success"></div>
+          <form class="createUser-form" role="form" action="/user" method="post">
+            <label>First Name</label><input type="text" class="form-control" placeholder="First Name" name="firstName">
+            <label>Last Name</label>
+            <input type="text" class="form-control" placeholder="Last Name" name="lastName">
+            <label>Email</label>
+            <input type="text" class="form-control" placeholder="Email" name="email">
+            <label>Username</label>
+            <input type="text" class="form-control" placeholder="Username" name="username">
+            <label>Password</label>
+            <input type="password" class="form-control" placeholder="Password" name="password">
+            <br>
+            <input type="password" class="form-control" placeholder="Confirm Password" name="passwordConfirm">
+            <button name="signUp_btn" class="btn btn-fill btn-danger btn-block">Sign Up</button>
+          </form>
+          <div class="forgot">
+            <a href="/forgotPass" class="btn btn-simple btn-danger">Forgot password?</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

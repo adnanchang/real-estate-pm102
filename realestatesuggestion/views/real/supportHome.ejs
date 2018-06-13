@@ -1,0 +1,427 @@
+
+<link href="/assets/css/examples.css" rel="stylesheet"/>
+<script>
+  function openCity(evt, tabName) {
+// Declare all variables
+    var i, tabcontent, tablinks;
+
+// Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+
+// Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+// Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+    $("#jsGrid_users").jsGrid("refresh");
+    $("#jsGrid_SupportQuestion").jsGrid("refresh");
+    $("#jsGrid_SearchHistory").jsGrid("refresh");
+
+  }
+</script>
+<script type="text/javascript" src="assets/js/HomeCollectInformation.js"></script>
+
+
+<ul class="tab">
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_1')">Users</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_2')">Questions</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_3')">Search history</a></li>
+  <li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_4')">Collect information</a></li>
+  <!--<li><a href="javascript:void(0)" class="tablinks" onclick="openCity(event, 'tab_5')">Create User</a></li>-->
+</ul>
+
+
+<div id="tab_1" class="tabcontent">
+  <h3>Users</h3>
+  <p>All Users are listed here</p>
+
+  <p>Want to create a new User? <a href="/register-support">Click Here</a></p>
+
+
+
+  <div id="jsGrid_users"></div>
+
+  <script>
+    $("#jsGrid_users").jsGrid({
+      height: "500px",
+      width: "100%",
+      filtering: true,
+      editing: true,
+      inserting: false,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 15,
+      pageButtonCount: 5,
+      controller: {
+        loadData: function (filter) {
+          var data = $.Deferred();
+          $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "/user",
+            dataType: "json"
+          }).done(function (response) {
+            response = $.grep(response, function (item) {
+              return (!filter.firstName || item.firstName.indexOf(filter.firstName) > -1)
+                && (!filter.lastName || item.lastName.indexOf(filter.lastName) > -1)
+                && (!filter.username || item.username.indexOf(filter.username) > -1)
+                && (!filter.email || item.email.indexOf(filter.email) > -1)
+                && (!filter.userType || item.userType.indexOf(filter.userType) > -1);
+            });
+
+            data.resolve(response);
+            console.log(response);
+          });
+          return data.promise();
+        },
+
+        insertItem: function (item) {
+          return $.ajax({
+            type: "POST",
+            url: "/user",
+            data: item
+          }).done(function () {
+            $("#jsGrid_users").jsGrid("loadData");
+          });
+        },
+
+        updateItem: function (item) {
+          return $.ajax({
+            type: "POST",
+            url: "/user/update/" + item.id,
+            data: item
+          }).done(function () {
+            $("#jsGrid_users").jsGrid("loadData");
+          });
+        },
+
+        deleteItem: function (item) {
+          return $.ajax({
+            type: "DELETE",
+            url: "/user",
+            data: item
+          }).done(function () {
+            $("#jsGrid_users").jsGrid("loadData");
+          });
+        },
+      },
+
+      fields: [
+        {name: "firstName", type: "text", width: 150, validate: "required"},
+        {name: "lastName", type: "text", width: 150, validate: "required"},
+        {name: "username", type: "text", width: 150, editing: false},
+        {name: "email", type: "text", width: 150, editing: false},
+        {name: "userType", type: "text", width: 150, editing: false},
+        {type: "control"}
+      ]
+    });
+  </script>
+
+</div>
+
+<div id="tab_2" class="tabcontent">
+  <h3>Questions</h3>
+  <p>This tab will contain something about the questions</p>
+  <div id="jsGrid_SupportQuestion"></div>
+  <div id="detailsDialog" style="width: 450px;">
+    <form id="detailsForm">
+      <div class="details-form-field">
+        <label for="qTitle">Title:</label>
+        <input readonly id="qTitle" name="qTitle" type="text"/>
+      </div>
+      <div class="details-form-field">
+        <label for="qBody">Body:</label>
+        <input readonly id="qBody" name="qBody" type="text"/>
+      </div>
+      <div class="details-form-field">
+        <label for="qDate">Date Asked:</label>
+        <input readonly id="qDate" name="qDate" type="text"/>
+      </div>
+      <div class="details-form-field">
+        <label for="rDate">Date Responded:</label>
+        <input readonly id="rDate" name="rDate" type="textinput"/>
+      </div>
+      <div class="details-form-field">
+        <label for="rResponse">Response:</label>
+        <input id="rResponse" name="rResponse" type="text"/>
+      </div>
+      <div class="details-form-field">
+        <button type="submit" id="save">Save</button>
+      </div>
+    </form>
+  </div>
+  <!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+  <script>
+
+
+    $(function () {
+      $("#jsGrid_SupportQuestion").jsGrid({
+        height: "500px",
+        width: "100%",
+        filtering: true,
+        editing: false,
+        inserting: false,
+        sorting: true,
+        paging: true,
+        autoload: true,
+        pageSize: 15,
+        pageButtonCount: 5,
+        rowClick: function (args) {
+          showDetailsDialog("Edit", args.item);
+        },
+        deleting: false,
+        controller: {
+          loadData: function (filter) {
+            var data = $.Deferred();
+            $.ajax({
+              type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "/supportquestion",
+              dataType: "json"
+            }).done(function (response) {
+              response = $.grep(response, function (item) {
+                return (!filter.questionTitle || item.questionTitle.indexOf(filter.questionTitle) > -1)
+                  && (!filter.questionBody || item.questionBody.indexOf(filter.questionBody) > -1)
+                  && (!filter.readDate || item.readDate.indexOf(filter.readDate) > -1)
+                  && (filter.isRead === undefined || item.isRead === filter.isRead)
+                  && (!filter.responseDate || item.responseDate.indexOf(filter.responseDate) > -1)
+                  && (!filter.responseDetail || item.responseDetail.indexOf(filter.responseDetail) > -1)
+
+              });
+
+              data.resolve(response);
+              console.log(response);
+            });
+            return data.promise();
+          },
+          updateItem: function (item) {
+            return $.ajax({
+              type: "POST",
+              url: "/supportquestion/update?id=" + item.id + "&res=" + item.responseDetail,
+              data: item
+            }).done(function () {
+              $("#jsGrid_SupportQuestion").jsGrid("loadData");
+            });
+          }
+        },
+
+        fields: [
+          {
+            name: "questionTitle",
+            type: "text",
+            width: 150,
+            title: 'Title',
+            validate: "required",
+            itemTemplate: function (value) {
+              var valueToShow = "";
+              if (value.length > 25) {
+                valueToShow = value.substring(0, 20) + "...";
+                return $("<div>").append(valueToShow);
+              }
+              else {
+                return $("<div>").append(value);
+              }
+            }
+          },
+          {
+            name: "questionBody",
+            type: "text",
+            width: 150,
+            title: 'Body',
+            validate: "required",
+            itemTemplate: function (value) {
+              var valueToShow = "";
+              if (value.length > 25) {
+                valueToShow = value.substring(0, 20) + "...";
+                return $("<div>").append(valueToShow);
+              }
+              else {
+                return $("<div>").append(value);
+              }
+            }
+          },
+          {
+            name: "createdAt", type: "text", width: 150, title: 'Question Date', editing: false,
+            itemTemplate: function (value) {
+              var d = new Date(value);
+              return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+            }
+          },
+          {name: "isRead", type: "checkbox", width: 150, editing: false, sorting: false},
+          {
+            name: "responseDate",
+            type: "text",
+            width: 150,
+            title: 'Response Date',
+            editing: false,
+            itemTemplate: function (value) {
+              var d = new Date(value);
+              return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+            }
+          },
+          {
+            name: "responseDetail",
+            type: "text",
+            width: 150,
+            title: 'Response',
+            editing: false,
+            itemTemplate: function (value) {
+              var valueToShow = "";
+              if (value.length > 25) {
+                valueToShow = value.substring(0, 20) + "...";
+                return $("<div>").append(valueToShow);
+              }
+              else {
+                return $("<div>").append(value);
+              }
+            }
+          },
+          {type: "control", width: 100, deleteButton: false, editButton: false}
+        ]
+      });
+
+      $("#detailsDialog").dialog({
+        autoOpen: false,
+        width: 450,
+        close: function() {
+          $("#detailsForm").validate().resetForm();
+          $("#detailsForm").find(".error").removeClass("error");
+        }
+      });
+
+      $("#detailsForm").validate({
+        rules: {
+          rResponse: "required"
+        },
+        messages: {
+          rResponse: "Please enter a response"
+        },
+        submitHandler: function() {
+          formSubmitHandler();
+        }
+      });
+
+      var formSubmitHandler = $.noop;
+
+      var showDetailsDialog = function(dialogType, item) {
+        if (item.isRead){
+          $('#rResponse').prop("readonly", true);
+        }
+
+        $('#qTitle').val(item.questionTitle);
+        $('#qBody').val(item.questionBody);
+        $('#qDate').val(item.createdAt);
+        $('#rResponse').val(item.responseDetail);
+        $('#rDate').val(item.responseDate);
+
+        formSubmitHandler = function() {
+          saveQuestion(item, dialogType === "Add");
+        };
+
+        $("#detailsDialog").dialog("option", "title", dialogType + " Support Question")
+          .dialog("open");
+      };
+
+      var saveQuestion = function(item, isNew) {
+        $.extend(item, {
+          responseDetail: $("#rResponse").val()
+        });
+
+        if (item.isRead){
+          $("#detailsDialog").dialog("close");
+        }
+        else if (!item.isRead){
+          $("#jsGrid_SupportQuestion").jsGrid(isNew ? "insertItem" : "updateItem", item);
+          $("#detailsDialog").dialog("close");
+        }
+      };
+    });
+  </script>
+</div>
+
+<div id="tab_3" class="tabcontent">
+  <h3>Something</h3>
+  <p>This tab will contain something undecided</p>
+  <div id="jsGrid_SearchHistory"></div>
+  <script>
+    $("#jsGrid_SearchHistory").jsGrid({
+      height: "500px",
+      width: "100%",
+      filtering: true,
+      editing: false,
+      //inserting: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 15,
+      pageButtonCount: 5,
+      controller: {
+        loadData: function (filter) {
+          var data = $.Deferred();
+          $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "/searchhistory",
+            dataType: "json"
+          }).done(function (response) {
+            response = $.grep(response, function (item) {
+              return (!filter.suggestedPrice || item.suggestedPrice === filter.suggestedPrice)
+                && (!filter.searchDate || item.searchDate.indexOf(filter.searchDate) > -1)
+                && (!filter.landType || item.landType.indexOf(filter.landType) > -1)
+                && (!filter.locatedArea || item.locatedArea.indexOf(filter.locatedArea) > -1)
+                && (!filter.user.username || item.user.username.indexOf(filter.user.username) > -1);
+            });
+
+            data.resolve(response);
+            console.log(response);
+          });
+          return data.promise();
+        }
+      },
+
+      fields: [
+        {name: "suggestedPrice", type: "number", width: 150, validate: "required"},
+        {name: "searchDate", type: "text", width: 150, validate: "required", title: "search date",itemTemplate: function (value) {
+          var d = new Date(value);
+          return $("<div>").append(d.toLocaleDateString() + " " + d.toLocaleTimeString());
+        }},
+        {name: "landType", type: "text", width: 150, validate: "required", title: "Land Type"},
+        {name: "locatedArea", type: "text", width: 150, validate: "required", title: "Area"},
+        {name: "user.username", type: "text", width: 150, validate: "required", title: "User"},
+        {type: "control", editButton:false, deleteButton:false}
+      ]
+    });
+  </script>
+
+</div>
+
+
+
+<div id="tab_4" class="tabcontent">
+  <h3>Basic Information</h3>
+  <p>Real estates information which collected for search algorithm:</p>
+  <div><p id="divLastConnected">Last collection happened on: 20/11/2016 11:11:05</p></div>
+  <div id="divRENum"><p id="divRealEstatesNumber">Number of real estates: </p></div>
+  <fieldset>
+    <legend>Collect now:</legend>
+    <form class="register-form" role="form" action="/search" method="post">
+      <table>
+        <tr>
+          <td>Keyword:</td>
+          <td>
+            <input type="text" id="txtKeyWord" value="Kiel">
+          </td>
+          <td><input type="button" id="btnPerformSearch" value="Collect information" onclick="performCollecting()"></td>
+        </tr>
+      </table>
+    </form>
+  </fieldset>
+</div>

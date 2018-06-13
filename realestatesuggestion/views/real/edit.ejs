@@ -1,0 +1,8 @@
+<form action="/user/update/<%= user.id %>" method="POST">
+  <h2>Edit a User</h2>
+
+  <input type="text" placeholder="Enter FirstName" name="firstName" value="<%= user.firstName%>"> <br>
+  <input type="text" placeholder="Enter Email" name="email" value="<%= user.email%>">
+  <input type="text" placeholder="Enter UserName" name="username" value="<%= user.username%>">
+  <input type="submit" value="Update User">
+</form>
